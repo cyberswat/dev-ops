@@ -129,7 +129,7 @@ class devops::install inherits devops::params {
   exec { 'set-rvm-ruby':
     command => "/usr/local/bin/rvm-set-ruby 1.8.7",
     onlyif => ["test -f /usr/local/bin/rvm-set-ruby", "test -f /usr/local/rvm/scripts/rvm"],
-    require => Exec['install-rvm'],
+    require => Exec['install-rvm-ruby'],
   }
 
   # Install the non-interactive packages that exist in standard repos.
