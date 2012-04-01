@@ -188,6 +188,11 @@ class devops::install inherits devops::params {
     unless  => 'test -d /root/ec2-api-tools',
   }
 
+  # Run the rvm installer if we need to. 
+  exec { 'php-cli-mod':
+    command => "/bin/sed -i 's/GPCS/EGPCS/g' /etc/php5/cli/php.ini",
+  }
+
 }
 
 # Define helper for standard packages.
