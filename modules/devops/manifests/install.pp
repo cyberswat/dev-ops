@@ -213,7 +213,8 @@ define devops::directories() {
 define devops::gems() {
   exec { "install-gems-${name}":
     command => "/usr/local/rvm/rubies/ruby-1.8.7-p358/bin/gem install ${name} --no-ri --no-rdoc",
-    unless => "/usr/local/rvm/rubies/ruby-1.8.7-p358/bin/gem list | /bin/grep -c ${name}"
+    unless => "/usr/local/rvm/rubies/ruby-1.8.7-p358/bin/gem list | /bin/grep -c ${name}",
+    onlyif => "test -f /usr/local/rvm/rubies/ruby-1.8.7-p358/bin/gem",
   }
 
 }
