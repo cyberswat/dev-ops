@@ -49,7 +49,7 @@ class devops::install inherits devops::params {
   # Sun has an interactive installer so we generate a seed file and feed it to 
   # dpkg as the response.  `debconf-get-selections | grep sun-` generates seed.
   file { "/var/cache/debconf/sun-java6-jdk.seeds":
-    source => "puppet:///devops/sun-java6-jdk.seeds",
+    source => "puppet:///modules/devops/sun-java6-jdk.seeds",
     ensure => present;
   }
   package { "sun-java6-jdk":
@@ -120,7 +120,7 @@ class devops::install inherits devops::params {
   }
 
   file { "/usr/local/bin/rvm-set-ruby":
-    source => "puppet:///devops/rvm-set-ruby",
+    source => "puppet:///modules/devops/rvm-set-ruby",
     ensure => present,
     mode => 755,
   }
