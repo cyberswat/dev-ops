@@ -60,7 +60,7 @@ class devops::install inherits devops::params {
 
   # Use pear to install XML_RPC - note XML_RPC is deprecated in favor of XML_RPC2.
   exec { "pear install XML_RPC-1.5.4":
-    onlyif => "test ! -d /usr/share/php/test/XML_RPC"
+    onlyif => ["test ! -d /usr/share/php/test/XML_RPC", "test -f /usr/bin/pear"]
   }
  
   # Download the rvm installer if rvm is not known.
@@ -128,7 +128,7 @@ class devops::install inherits devops::params {
   # Use rvm to install ruby 1.8.7
   exec { 'set-rvm-ruby':
     command => "/usr/local/bin/rvm-set-ruby 1.8.7",
-    onlyif => "test -f /usr/local/bin/rvm-set-ruby",
+    onlyif => ["test -f /usr/local/bin/rvm-set-ruby", "test -f /usr/local/rvm/scripts/rvm"],
     require => Exec['install-rvm'],
   }
 
