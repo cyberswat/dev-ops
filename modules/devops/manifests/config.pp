@@ -35,5 +35,20 @@ class devops::config(
     mode => 0644,
   }
 
+  # Install a .bash_profile file with our modifications.
+  file { "${devops::config::home}/.bash_profile":
+    source => "puppet:///devops/bash_profile",
+    ensure => present,
+    mode => 0644,
+  }
+
+  # Install a .bash_logout file with our modifications.
+  file { "${devops::config::home}/.bash_logout":
+    source => "puppet:///devops/bash_logout",
+    ensure => present,
+    mode => 0644,
+  }
+
+
 }
 
