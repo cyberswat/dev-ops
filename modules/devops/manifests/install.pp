@@ -190,7 +190,7 @@ class devops::install inherits devops::params {
 
   # Run the rvm installer if we need to. 
   #exec { 'php-cli-mod':
-  #  command => "/bin/sed -i 's/GPCS/EGPCS/g' /etc/php5/cli/php.ini",
+  #  command => "/bin/sed -i 's/\"GPCS\"/\"EGPCS\"/g' /etc/php5/cli/php.ini",
   #}
 
 }
