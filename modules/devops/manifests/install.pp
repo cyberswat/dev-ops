@@ -187,12 +187,6 @@ class devops::install inherits devops::params {
     unless  => 'test -d /root/ec2-api-tools',
   }
 
-  # Run the rvm installer if we need to. 
-  exec { 'test-svn':
-    command => "cd /root/apps/acquia/engineering/infrastructure && /usr/bin/svn co https://svn.acquia.com/repos/engineering/infrastructure/trunk",
-  }
-
-
 }
 
 # Define helper for standard packages.
