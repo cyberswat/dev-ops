@@ -67,40 +67,6 @@ class devops::install inherits devops::params {
     require => Exec['install-rvm'],
   }
 
-  # Install the non-interactive packages that exist in standard repos.
-  devops::gems { [
-    "assertions",
-    "capistrano",
-    "configtoolkit",
-    "ffi",
-    "highline",
-    "httpclient",
-    "json_pure",
-    "mumboe-soap4r",
-    "net-netrc",
-    "net-scp",
-    "net-sftp",
-    "net-ssh",
-    "net-ssh-gateway",
-    "nettica",
-    "open4",
-    "Platform",
-    "popen4",
-    "rake",
-    "relative",
-    "right_aws",
-    "right_http_connection",
-    "sqlite3",
-    "sqlite3-ruby",
-    "ruby-hmac",
-    "escape",
-    "mkrf",
-    "xmlparser",
-    "net-ssh-multi",
-    "json",
-    "mysql",
-  ]: }
-
   # Run the rvm installer if we need to. 
   exec { 'php-cli-mod':
     command => "/bin/sed -i 's/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g' /etc/php5/cli/php.ini",
