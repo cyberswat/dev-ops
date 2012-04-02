@@ -61,73 +61,10 @@ class devops::install inherits devops::params {
     onlyif => ["test ! -d /usr/share/php/test/XML_RPC", "test -f /usr/bin/pear"]
   }
  
-  # Download the rvm installer if rvm is not known.
-  exec { 'download-rvm-install':
-    command => 'wget -O /tmp/rvm https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer',
-    creates => '/tmp/rvm',
-    path => '/usr/bin',
-    unless  => 'test -f /usr/local/rvm/bin/rvm',
-  }
-
-  # Run the rvm installer if we need to. 
-  exec { 'install-rvm':
-    command => "bash /tmp/rvm",
-    creates => '/usr/local/rvm/bin/rvm',
-    require => Exec['download-rvm-install'],
-  }
-
   # Remove the rvm install script if necessary.
   file { '/tmp/rvm':
     ensure  => absent,
     require => Exec['install-rvm'],
-  }
-
-  # Use rvm to install zlib
-  exec { 'install-rvm-zlib':
-    command => "rvm pkg install zlib",
-    creates => '/usr/local/rvm/usr/lib/libz.so',
-    require => Exec['install-rvm'],
-  }
-
-  # Use rvm to install opnssl
-  exec { 'install-rvm-openssl':
-    command => "rvm pkg install openssl",
-    creates => '/usr/local/rvm/usr/lib/libssl.so',
-    require => Exec['install-rvm'],
-  }
-
-  # Use rvm to install libxml2
-  exec { 'install-rvm-libxml2':
-    command => "rvm pkg install libxml2",
-    creates => '/usr/local/rvm/usr/lib/libxml2.so',
-    require => Exec['install-rvm'],
-  }
-
-  # Use rvm to install libxslt
-  exec { 'install-rvm-libxslt':
-    command => "rvm pkg install libxslt",
-    creates => '/usr/local/rvm/usr/lib/libxslt.so',
-    require => Exec['install-rvm'],
-  }
-
-  # Use rvm to install ruby 1.8.7
-  exec { 'install-rvm-ruby':
-    command => "rvm install 1.8.7 --with-openssl-dir=/usr/local/rvm/usr --with-zlib-dir=/usr/local/rvm/usr --with-libxml2-dir=/usr/local/rvm/usr --with-libxslt-dir=/usr/local/rvm/usr",
-    creates => '/usr/local/rvm/rubies/ruby-1.8.7-p358',
-    require => Exec['install-rvm'],
-  }
-
-  file { "/usr/local/bin/rvm-set-ruby":
-    source => "puppet:///modules/devops/rvm-set-ruby",
-    ensure => present,
-    mode => 755,
-  }
-
-  # Use rvm to install ruby 1.8.7
-  exec { 'set-rvm-ruby':
-    command => "/usr/local/bin/rvm-set-ruby 1.8.7",
-    onlyif => ["test -f /usr/local/bin/rvm-set-ruby", "test -f /usr/local/rvm/scripts/rvm"],
-    require => Exec['install-rvm-ruby'],
   }
 
   # Install the non-interactive packages that exist in standard repos.
@@ -183,15 +120,5 @@ define devops::directories() {
   file { "${name}":
     ensure => "directory",
   }
-}
-
-# Define helper for standard packages.
-define devops::gems() {
-  exec { "install-gems-${name}":
-    command => "/usr/local/rvm/rubies/ruby-1.8.7-p358/bin/gem install ${name} --no-ri --no-rdoc",
-    unless => "/usr/local/rvm/rubies/ruby-1.8.7-p358/bin/gem list | /bin/grep -c ${name}",
-    onlyif => "test -f /usr/local/rvm/rubies/ruby-1.8.7-p358/bin/gem",
-  }
-
 }
 

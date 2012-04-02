@@ -14,7 +14,8 @@
 #  }
 #
 class devops::config(
-  $home  = '/root'
+  $home  = '/root',
+  $rvm_path = '/usr/local/rvm',
 ) {
   # Create the directories we need.
   devops::directories { [
@@ -73,6 +74,78 @@ class devops::config(
     command => "mv ${devops::config::home}/apps/ec2-api-tools* ${devops::config::home}/ec2-api-tools",
     require => Exec['unzip-ec2-api-tools'],
     unless  => "test -d ${devops::config::home}/ec2-api-tools",
+  }
+
+  # Download the rvm installer if rvm is not known.
+  exec { 'download-rvm-install':
+    command => 'wget -O /tmp/rvm https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer',
+    creates => '/tmp/rvm',
+    unless  => "test -f ${devops::config::rvm_path}/bin/rvm",
+  }
+
+  # Run the rvm installer if we need to. 
+  exec { 'install-rvm':
+    command => "bash /tmp/rvm",
+    creates => "${devops::config::rvm_path}/bin/rvm",
+    require => Exec['download-rvm-install'],
+  }
+
+  # Use rvm to install zlib
+  exec { 'install-rvm-zlib':
+    command => "rvm pkg install zlib",
+    creates => "${devops::config::rvm_path}/usr/lib/libz.so",
+    require => Exec['install-rvm'],
+  }
+
+  # Use rvm to install opnssl
+  exec { 'install-rvm-openssl':
+    command => "rvm pkg install openssl",
+    creates => "${devops::config::rvm_path}/usr/lib/libssl.so",
+    require => Exec['install-rvm'],
+  }
+
+  # Use rvm to install libxml2
+  exec { 'install-rvm-libxml2':
+    command => "rvm pkg install libxml2",
+    creates => "${devops::config::rvm_path}/usr/lib/libxml2.so",
+    require => Exec['install-rvm'],
+  }
+
+  # Use rvm to install libxslt
+  exec { 'install-rvm-libxslt':
+    command => "rvm pkg install libxslt",
+    creates => "${devops::config::rvm_path}/usr/lib/libxslt.so",
+    require => Exec['install-rvm'],
+  }
+
+  # Use rvm to install ruby 1.8.7
+  exec { 'install-rvm-ruby':
+    command => "rvm install 1.8.7 --with-openssl-dir=${devops::config::rvm_path}/usr --with-zlib-dir=${devops::config::rvm_path}/usr --with-libxml2-dir=${devops::config::rvm_path}/usr --with-libxslt-dir=${devops::config::rvm_path}/usr",
+    creates => "${devops::config::rvm_path}/rubies/ruby-1.8.7-p358",
+    require => Exec['install-rvm'],
+  }
+
+  file { "${devops::config::rvm_path}/rvm-set-ruby":
+    source => "puppet:///modules/devops/rvm-set-ruby",
+    ensure => present,
+    mode => 755,
+  }
+
+  # Use rvm to install ruby 1.8.7
+  exec { 'set-rvm-ruby':
+    command => "${devops::config::rvm_path}/bin/rvm-set-ruby 1.8.7",
+    onlyif => ["test -f ${devops::config::rvm_path}/bin/rvm-set-ruby", "test -f ${devops::config::rvm_path}/scripts/rvm"],
+    require => Exec['install-rvm-ruby'],
+  }
+
+}
+
+# Define helper for standard packages.
+define devops::gems() {
+  exec { "install-gems-${name}":
+    command => "${devops::config::rvm_path}/rubies/ruby-1.8.7-p358/bin/gem install ${name} --no-ri --no-rdoc",
+    unless => "${devops::config::rvm_path}/rubies/ruby-1.8.7-p358/bin/gem list | /bin/grep -c ${name}",
+    onlyif => "test -f ${devops::config::rvm_path}/rubies/ruby-1.8.7-p358/bin/gem",
   }
 
 }
