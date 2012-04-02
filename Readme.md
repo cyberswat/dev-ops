@@ -12,4 +12,7 @@ Upload your hosting-dev folder to ~/secure/ec2/hosting-dev and your system-tests
 
     chmod 0400 ~/secure/ec2/hosting-dev/ssh/default && chmod 0400 ~/secure/ec2/system-tests/ssh/default
 
+Now that all of the pre-requisites are in place we need to identify an account and stage.  Replace cyberswat with your name.
+
+    facct hosting-dev && fstage cyberswat
 
