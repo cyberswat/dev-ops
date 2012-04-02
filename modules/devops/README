@@ -1,3 +1,3 @@
-dev
+devops
 
-This is the dev module.
+This is the devops module.  It is intended to create a development environment for cloud engineering.  It is intended to run against Ubuntu Lucid 10.04 LTS only.
