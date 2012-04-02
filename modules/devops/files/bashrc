@@ -104,5 +104,4 @@ export SECURE=$HOME/secure
 export EC2_HOME=$HOME/apps/ec2-api-tools
 export RUBYLIB=$HOME/apps/acquia/engineering/itlib/trunk/lib:$HOME/apps/acquia/engineering/infrastructure/trunk/lib/lib
 export PATH=$PATH:$HOME/apps/ec2-api-tools/bin
-#export PATH=/usr/local/rvm/gems/ruby-1.8.7-p352/bin:$PATH
-
+source $HOME/apps/acquia/engineering/fields/trunk/hosting_aliases
