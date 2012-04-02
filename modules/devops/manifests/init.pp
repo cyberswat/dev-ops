@@ -1,16 +1,7 @@
-# Class: dev
+# Class: devops
 #
-# This module manages dev
+# This module manages configuring a cloud development environment.
 #
-# Parameters:
-#
-# Actions:
-#
-# Requires:
-#
-# Sample Usage:
-#
-# [Remember: No empty lines between comments and class definition]
 class devops {
   include devops::install
 }

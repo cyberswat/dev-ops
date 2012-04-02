@@ -1,8 +1,11 @@
 # == Class: devops::config
 #
-# Manages variables for the Acquia devops install.
+# Manages the bits dependant on variable configs.
 #
 # === Variables
+#
+# [*home*]
+#   Optional: yes
 #
 # [*home*]
 #   Optional: yes
@@ -10,13 +13,14 @@
 # === Examples
 #
 #  class { 'devops::config' :
-#    home => '/home/cyberswat'
+#    home => '/home/cyberswat',
+#    rvm_path => '/home/cyberswat/.rvm'
 #  }
-#
 class devops::config(
   $home  = '/root',
   $rvm_path = '/usr/local/rvm',
 ) {
+
   # Create the directories we need.
   devops::directories { [
     "${devops::config::home}/apps",
@@ -52,24 +56,24 @@ class devops::config(
 
   # Set paths for later use.
   Exec {
-    path => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/rvm/bin',
+    path => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/rvm/bin:~/.rvm/bin',
   }
 
-  # Download the ec2-api-tools.
+  # Download the ec2-api-tools if we need to.
   exec { 'download-ec2-api-tools':
     command => 'wget -O /tmp/ec2-api-tools.zip http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip',
     creates => '/tmp/ec2-api-tools.zip',
     unless  => "test -d ${devops::config::home}/ec2-api-tools",
   }
 
-  # Run the rvm installer if we need to. 
+  # If we have downloaded the ec2 tools unzip them.
   exec { 'unzip-ec2-api-tools':
     command => "unzip -d ${devops::config::home}/apps/ /tmp/ec2-api-tools.zip",
     require => Exec['download-ec2-api-tools'],
     unless  => "test -d ${devops::config::home}/ec2-api-tools",
   }
 
-  # Run the rvm installer if we need to. 
+  # If we have downloaded and unzipped ec2 tools move them to the correct location.
   exec { 'mv-ec2-api-tools':
     command => "mv ${devops::config::home}/apps/ec2-api-tools* ${devops::config::home}/ec2-api-tools",
     require => Exec['unzip-ec2-api-tools'],
@@ -83,7 +87,7 @@ class devops::config(
     unless  => "test -f ${devops::config::rvm_path}/bin/rvm",
   }
 
-  # Run the rvm installer if we need to. 
+  # Run the rvm installer if we need to. Cleanup of this file happens in install.pp.
   exec { 'install-rvm':
     command => "bash /tmp/rvm",
     creates => "${devops::config::rvm_path}/bin/rvm",
@@ -125,20 +129,21 @@ class devops::config(
     require => Exec['install-rvm'],
   }
 
+  # Can not call `rvm use 1.8.7 --default` directly so need to rely on this helper script. 
   file { "${devops::config::rvm_path}/bin/rvm-set-ruby":
     source => "puppet:///modules/devops/rvm-set-ruby",
     ensure => present,
     mode => 755,
   }
 
-  # Use rvm to install ruby 1.8.7
+  # Usea helper script to `rvm use 1.8.7 --default`.
   exec { 'set-rvm-ruby':
     command => "${devops::config::rvm_path}/bin/rvm-set-ruby 1.8.7",
     onlyif => ["test -f ${devops::config::rvm_path}/bin/rvm-set-ruby", "test -f ${devops::config::rvm_path}/scripts/rvm"],
     require => Exec['install-rvm-ruby'],
   }
 
-  # Install the non-interactive packages that exist in standard repos.
+  # Install the necessary gems.
   devops::gems { [
     "assertions",
     "capistrano",
@@ -174,7 +179,7 @@ class devops::config(
 
 }
 
-# Define helper for standard packages.
+# Define helper for gem installation.
 define devops::gems() {
   exec { "install-gems-${name}":
     command => "${devops::config::rvm_path}/rubies/ruby-1.8.7-p358/bin/gem install ${name} --no-ri --no-rdoc",

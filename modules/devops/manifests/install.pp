@@ -1,13 +1,10 @@
 # == Class: dev::install
 #
-# Creates an Acquia ops development environment.
-#
-# === Parameters
-#
-class devops::install inherits devops::params {
+# Manages the bits that aren't dynamic.
+class devops::install {
   # Set paths for later use.
   Exec {
-    path => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/rvm/bin',
+    path => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/rvm/bin:~/.rvm/bin',
   }
 
   # Install the non-interactive packages that exist in standard repos.
@@ -48,12 +45,12 @@ class devops::install inherits devops::params {
   # dpkg as the response.  `debconf-get-selections | grep sun-` generates seed.
   file { "/var/cache/debconf/sun-java6-jdk.seeds":
     source => "puppet:///modules/devops/sun-java6-jdk.seeds",
-    ensure => present;
+    ensure => present,
   }
   package { "sun-java6-jdk":
-    require      => File["/var/cache/debconf/sun-java6-jdk.seeds"],
+    require => File["/var/cache/debconf/sun-java6-jdk.seeds"],
     responsefile => "/var/cache/debconf/sun-java6-jdk.seeds",
-    ensure       => present;
+    ensure => present,
   }
 
   # Use pear to install XML_RPC - note XML_RPC is deprecated in favor of XML_RPC2.
@@ -61,13 +58,13 @@ class devops::install inherits devops::params {
     onlyif => ["test ! -d /usr/share/php/test/XML_RPC", "test -f /usr/bin/pear"]
   }
  
-  # Remove the rvm install script if necessary.
+  # Remove the rvm install script if necessary. The bulk of the rvm install is in config.pp
   file { '/tmp/rvm':
     ensure  => absent,
     require => Exec['install-rvm'],
   }
 
-  # Run the rvm installer if we need to. 
+  # Modify php.ini.  This will run each time puppet updates and can probably be improved.
   exec { 'php-cli-mod':
     command => "/bin/sed -i 's/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g' /etc/php5/cli/php.ini",
   }
