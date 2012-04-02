@@ -134,9 +134,10 @@ class devops::config(
     source => "puppet:///modules/devops/rvm-set-ruby",
     ensure => present,
     mode => 755,
+    onlyif => "test -f ${devops::config::rvm_path}/bin",
   }
 
-  # Usea helper script to `rvm use 1.8.7 --default`.
+  # Use a helper script to `rvm use 1.8.7 --default`.
   exec { 'set-rvm-ruby':
     command => "${devops::config::rvm_path}/bin/rvm-set-ruby 1.8.7",
     onlyif => ["test -f ${devops::config::rvm_path}/bin/rvm-set-ruby", "test -f ${devops::config::rvm_path}/scripts/rvm"],
