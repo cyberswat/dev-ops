@@ -41,6 +41,13 @@ class devops::install {
     "libmysqlclient-dev",
   ]: }
 
+  # Can not call `rvm use 1.8.7 --default` directly so need to rely on this helper script. 
+  file { "/usr/local/bin/rvm-set-ruby":
+    source => "puppet:///modules/devops/rvm-set-ruby",
+    ensure => present,
+    mode => 755,
+  }
+
   # Sun has an interactive installer so we generate a seed file and feed it to 
   # dpkg as the response.  `debconf-get-selections | grep sun-` generates seed.
   file { "/var/cache/debconf/sun-java6-jdk.seeds":

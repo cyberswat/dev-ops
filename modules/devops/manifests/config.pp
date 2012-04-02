@@ -129,18 +129,10 @@ class devops::config(
     require => Exec['install-rvm'],
   }
 
-  # Can not call `rvm use 1.8.7 --default` directly so need to rely on this helper script. 
-  file { "${devops::config::rvm_path}/bin/rvm-set-ruby":
-    source => "puppet:///modules/devops/rvm-set-ruby",
-    ensure => present,
-    mode => 755,
-    onlyif => "test -d ${devops::config::rvm_path}/bin",
-  }
-
   # Use a helper script to `rvm use 1.8.7 --default`.
   exec { 'set-rvm-ruby':
-    command => "${devops::config::rvm_path}/bin/rvm-set-ruby 1.8.7",
-    onlyif => ["test -f ${devops::config::rvm_path}/bin/rvm-set-ruby", "test -f ${devops::config::rvm_path}/scripts/rvm"],
+    command => "/usr/local/bin/rvm-set-ruby 1.8.7",
+    onlyif => ["test -f /usr/local/bin/rvm-set-ruby", "test -f ${devops::config::rvm_path}/scripts/rvm"],
     require => Exec['install-rvm-ruby'],
   }
 
