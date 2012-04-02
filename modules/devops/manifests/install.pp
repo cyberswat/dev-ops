@@ -28,13 +28,11 @@ class devops::install inherits devops::params {
     "git-core",
     "zlib1g-dev",
     "libssl-dev",
-#    "libxslt-dev",
     "libyaml-dev",
     "libsqlite3-0",
     "libxml2-dev",
     "autoconf",
     "libc6-dev",
-#    "ncurses-dev",
     "automake",
     "libtool",
     "bison",
@@ -166,32 +164,10 @@ class devops::install inherits devops::params {
     "mysql",
   ]: }
 
-  # Download the ec2-api-tools.
-  exec { 'download-ec2-api-tools':
-    command => 'wget -O /tmp/ec2-api-tools.zip http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip',
-    creates => '/tmp/ec2-api-tools.zip',
-    path => '/usr/bin',
-    unless  => 'test -d /root/ec2-api-tools',
-  }
-
   # Run the rvm installer if we need to. 
-  exec { 'unzip-ec2-api-tools':
-    command => "unzip -d /root/apps/ /tmp/ec2-api-tools.zip",
-    require => Exec['download-ec2-api-tools'],
-    unless  => 'test -d /root/ec2-api-tools',
+  exec { 'php-cli-mod':
+    command => "/bin/sed -i 's/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g' /etc/php5/cli/php.ini",
   }
-
-  # Run the rvm installer if we need to. 
-  exec { 'mv-ec2-api-tools':
-    command => "/bin/mv /root/apps/ec2-api-tools* /root/ec2-api-tools",
-    require => Exec['unzip-ec2-api-tools'],
-    unless  => 'test -d /root/ec2-api-tools',
-  }
-
-  # Run the rvm installer if we need to. 
-  #exec { 'php-cli-mod':
-  #  command => "/bin/sed -i 's/\"GPCS\"/\"EGPCS\"/g' /etc/php5/cli/php.ini",
-  #}
 
 }
 
