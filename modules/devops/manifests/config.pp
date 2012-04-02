@@ -125,7 +125,7 @@ class devops::config(
     require => Exec['install-rvm'],
   }
 
-  file { "${devops::config::rvm_path}/rvm-set-ruby":
+  file { "${devops::config::rvm_path}/bin/rvm-set-ruby":
     source => "puppet:///modules/devops/rvm-set-ruby",
     ensure => present,
     mode => 755,
