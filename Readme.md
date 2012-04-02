@@ -8,3 +8,8 @@ Once you have a working Lucid installation run:
 
 You will be prompted to enter your svn username and password after puppet has completed it's run.  Once svn has finished it's checkouts exit your terminal session and log back in to ensure a working environment.
 
+Upload your hosting-dev folder to ~/secure/ec2/hosting-dev and your system-tests folder to ~/secure/ec2/system-tests.  Ensure the keys contained in those folders have the correct permissions.
+
+    chmod 0400 ~/secure/ec2/hosting-dev/ssh/default && chmod 0400 ~/secure/ec2/system-tests/ssh/default
+
+
